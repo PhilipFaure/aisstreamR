@@ -2,7 +2,7 @@ Package: aisstreamR
 Type: Package
 Title: AISStream WebSocket Client
 Version: 0.2.0
-versionName: flooded apartment block floor..
+versionName: flooded my apartment block floor..
 Author: Philip Faure
 Maintainer: Philip Faure <philip.faure@birdlife.org.za>
 Description: Connect to AISStream.io WebSocket API, decode AIS hex messages, and extract ship positions.
