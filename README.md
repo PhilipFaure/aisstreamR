@@ -35,10 +35,13 @@ To close the connection and stop receiving data, you can use the `close_ais_stre
 
 ### Example:
 ```
+# load package
 library(aisstreamR)
 
+# add API key
 api_key <- "YOUR_API_KEY"
 
+# provide bounding box coordinates
 bbox <- list(
   list(
     list(-33.90081, 18.39103), 
@@ -46,8 +49,10 @@ bbox <- list(
   )
 )
 
+# open connection and stream AIS messages
 ws <- connect_ais_stream(api_key, bbox)
 
+# close connection
 close_ais_stream()
 ```
 
