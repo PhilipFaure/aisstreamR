@@ -223,7 +223,7 @@ connect_ais_stream <- function(api_key, bounding_box = NULL, file_path = NULL, l
           
           if (verbose) {
             cat(
-              "⚓️ New message received ++++++++++++++++++++++++++++++++", "\n",
+              " ⚓️ New message received ++++++++++++++++++++++++++++++++", "\n",
               "| ShipName =", ship_name, "\n",
               "| MMSI =", mmsi, "\n",
               "| Latitude =", lat,
