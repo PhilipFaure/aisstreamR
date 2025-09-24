@@ -1,7 +1,0 @@
-library(devtools)
-library(roxygen2)
-
-roxygen2::roxygenise()
-
-devtools::install("C:/Users/Vulpe/Documents/GitHub/aisstreamR")
-
