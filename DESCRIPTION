@@ -9,7 +9,9 @@ Description: Connect to AISStream.io WebSocket API, decode AIS hex messages, and
 License: MIT
 Imports:
     websocket,
-    jsonlite
+    jsonlite,
+    later,
+    sf
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.3.2

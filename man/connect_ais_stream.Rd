@@ -6,7 +6,10 @@
 \usage{
 connect_ais_stream(
   api_key,
-  bounding_box,
+  bounding_box = NULL,
+  file_path = NULL,
+  layer = NULL,
+  verbose = TRUE,
   reconnect_delay = 5,
   heartbeat_interval = NULL,
   outDir = NULL
@@ -15,7 +18,13 @@ connect_ais_stream(
 \arguments{
 \item{api_key}{Your AISStream API key as a string.}
 
-\item{bounding_box}{List of coordinates: list(list(c(lat1, lon1), c(lat2, lon2)))}
+\item{bounding_box}{List of coordinates: list(list(c(lat1, lon1), c(lat2, lon2))).}
+
+\item{file_path}{Character string to a shapefile, KML, or KMZ file.}
+
+\item{layer}{Character string specifying the layer name in the file if it contains multiple layers.}
+
+\item{verbose}{Logical. If TRUE, status messages will be printed to the console (default: TRUE).}
 
 \item{reconnect_delay}{Seconds to wait before reconnecting after a disconnect (default: 5)}
 
@@ -27,5 +36,5 @@ connect_ais_stream(
 A WebSocket object
 }
 \description{
-Connect through the AISStream.io WebSocket to receive real-time vessel AIS messages for a specified bounding box.
+Connect through the AISStream.io WebSocket to receive real-time vessel AIS messages for a specified bounding box or spatial file.
 }
