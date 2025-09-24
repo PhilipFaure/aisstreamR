@@ -1,7 +1,7 @@
 Package: aisstreamR
 Type: Package
 Title: AISStream WebSocket Client
-Version: 0.3.2
+Version: 0.3.3
 versionName: happyEddie
 Author: Philip Faure
 Maintainer: Philip Faure <philip.faure@birdlife.org.za>
