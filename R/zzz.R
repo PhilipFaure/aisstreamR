@@ -12,9 +12,9 @@
   
   packageStartupMessage(
     paste0(
-      pkgname, "\n",
+      "🚀 ", pkgname, "\n",
       "Version: ", "v", v, "\n",
-      "VersionName: ", " \"", vN, "\""
+      "VersionName: ", " \"", vN, "\"  🍜"
     )
   )
 }

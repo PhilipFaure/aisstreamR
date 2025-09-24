@@ -171,7 +171,7 @@ connect_ais_stream <- function(api_key, bounding_box = NULL, file_path = NULL, l
     
     ws$onOpen(function(event) {
       if (verbose) {
-        cat("Connected!\n")
+        cat(" 🛜 Connected!                                          🛜\n")
       }
       ws$send(subscription_message)
       
@@ -217,19 +217,35 @@ connect_ais_stream <- function(api_key, bounding_box = NULL, file_path = NULL, l
           
           mmsi <- decoded$MetaData$MMSI
           ship_name <- decoded$MetaData$ShipName
+          
           lat <- decoded$MetaData$latitude
           lon <- decoded$MetaData$longitude
-          time_utc <- decoded$MetaData$time_utc
+          formatted_lat <- sprintf("%9.6f", lat)
+          formatted_lon <- sprintf("%9.6f", lon)
           
+          time_utc <- decoded$MetaData$time_utc
+          time_sast <- as.POSIXct(
+            format(
+              lubridate::ymd_hms(time_utc), 
+              tz = "Africa/Johannesburg"
+            )
+          )
+          
+            
           if (verbose) {
             cat(
-              " ⚓️ New message received ++++++++++++++++++++++++++++++++", "\n",
-              "| ShipName =", ship_name, "\n",
-              "| MMSI =", mmsi, "\n",
-              "| Latitude =", lat,
-              "| Longitude =", lon, "\n",
-              "⚓️ TimeUTC =", time_utc,
-              "📍 \n"
+              " ---------------------------------------------------------", "\n",
+              "📧                 NEW MESSAGE RECEIVED                📧", "\n",
+              "⚓️ ShipName =", ship_name, "\n",
+              "⚓️ MMSI =", mmsi, "\n",
+              "⚓️ TimeSAST =", format(time_sast,
+                                     "%Y-%m-%d %H:%M:%S %Z"),
+              "  \n",
+              
+              "⚓️ Latitude =", formatted_lat, "| Longitude =", formatted_lon, 
+              "      📍\n",
+              
+              "---------------------------------------------------------", "\n"
             )
           }
           
@@ -284,7 +300,7 @@ connect_ais_stream <- function(api_key, bounding_box = NULL, file_path = NULL, l
         .aisstream_env$reconnect_handle <- later::later(start_connection, reconnect_delay)
       } else {
         if (verbose) {
-          cat("WebSocket closed gracefully.\n")
+          message(" 🪦 AIS WebSocket rests peacefully...\n")
         }
       }
     })

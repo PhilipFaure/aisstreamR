@@ -27,7 +27,7 @@ close_ais_stream <- function() {
     .aisstream_env$is_shutting_down <- TRUE
     
     try(ws$close(), silent = TRUE)
-    message("AIS WebSocket closing...")
+    message("💀 AIS WebSocket closing...")
     
     if (exists("reconnect_handle", envir = .aisstream_env)) {
       later_handle <- get("reconnect_handle", envir = .aisstream_env)
