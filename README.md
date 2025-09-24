@@ -20,6 +20,8 @@ The connect_ais_stream() function will open a persistent WebSocket connection. A
 ##### 3. Disconnect
 To close the connection and stop receiving data, you can use the `close_ais_stream()` function.
 
+---
+
 ### Key Functions
 
     `connect_ais_stream()`: Establishes a WebSocket connection and begins streaming data.
@@ -47,3 +49,5 @@ ws <- connect_ais_stream(api_key, bbox)
 
 close_ais_stream()
 ```
+
+---
