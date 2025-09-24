@@ -4,3 +4,4 @@
 .Ruserdata
 ./test/ais_data.csv
 .test/ais_data.csv
+example.R
