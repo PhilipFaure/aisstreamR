@@ -10,9 +10,6 @@ The package handles WebSocket connections, subscribes to data streams based on u
 
 ---
 
-### Installation ⚓️
-```devtools::install_github("PhilipFaure/aisstreamR")```
-
 ### How to use ⚓️
 ##### 1. Obtain and API key from https://aisstream.io/apikeys
 ##### 2. Connect to the Stream
@@ -35,6 +32,9 @@ To close the connection and stop receiving data, you can use the `close_ais_stre
 
 ### Example ⚓️
 ```
+# installation
+devtools::install_github("PhilipFaure/aisstreamR")
+
 # load package
 library(aisstreamR)
 
