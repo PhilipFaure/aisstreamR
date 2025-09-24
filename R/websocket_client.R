@@ -12,6 +12,7 @@
 #' @param outDir Character string specifying the output directory to save data. If NULL, data is not saved.
 #' @return A WebSocket object
 #' @export
+#' @importFrom utils write.table
 connect_ais_stream <- function(api_key, bounding_box = NULL, file_path = NULL, layer = NULL, verbose = TRUE, reconnect_delay = 5, heartbeat_interval = NULL, outDir = NULL) {
   
   master_ais_columns <- c(
