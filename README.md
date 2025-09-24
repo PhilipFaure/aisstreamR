@@ -2,7 +2,7 @@
 
 ![How to](https://github.com/PhilipFaure/aisstreamR/blob/main/images/connect_ais_stream.gif)
 
-### Description
+### Description ⚓️
 
 `aisstreamR` is an R package that provides a simple and reliable way to connect to the AISStream WebSocket API. It allows users to stream real-time maritime data, including vessel positions, ship names, and other critical information, directly into their R environment. This data can be used for research, data analysis, or real-time monitoring of maritime traffic within a specified geographic area.
 
@@ -10,10 +10,10 @@ The package handles WebSocket connections, subscribes to data streams based on u
 
 ---
 
-### Installation
+### Installation ⚓️
 ```devtools::install_github("PhilipFaure/aisstreamR")```
 
-### How to use `aisstreamR`
+### How to use ⚓️
 ##### 1. Obtain and API key from https://aisstream.io/apikeys
 ##### 2. Connect to the Stream
 Use the connect_ais_stream() function to start receiving real-time data. You'll need to provide your API key and the coordinates for the bounding box you want to monitor.
@@ -23,7 +23,7 @@ To close the connection and stop receiving data, you can use the `close_ais_stre
 
 ---
 
-### Key Functions
+### Key Functions ⚓️
 
     `connect_ais_stream()`: Establishes a WebSocket connection and begins streaming data.
 
@@ -33,7 +33,7 @@ To close the connection and stop receiving data, you can use the `close_ais_stre
 
 ---
 
-### Example:
+### Example ⚓️
 ```
 # load package
 library(aisstreamR)
