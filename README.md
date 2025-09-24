@@ -1,6 +1,6 @@
 # aisstreamR
 
-![How to](images/connect_ais_stream.gif)
+![How to](https://github.com/PhilipFaure/aisstreamR/blob/main/images/connect_ais_stream.gif)
 
 ### Install devtools if needed
 ```install.packages("devtools")```

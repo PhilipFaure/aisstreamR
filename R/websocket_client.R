@@ -171,15 +171,16 @@ connect_ais_stream <- function(api_key, bounding_box, reconnect_delay = 5, heart
         ship_name <- decoded$MetaData$ShipName
         lat <- decoded$MetaData$latitude
         lon <- decoded$MetaData$longitude
-        time_utc <- as.POSIXct(decoded$MetaData$time_utc, tz="UTC")
+        # time_utc <- as.POSIXct(decoded$MetaData$time_utc, tz="UTC", format="%Y-%m-%d %H:%M:%S")
+        time_utc <- decoded$MetaData$time_utc
         
         cat(
-          "⚓️ Message received: ", 
-          "| ShipName =", ship_name, 
-          "| MMSI =", mmsi, 
+          "⚓️ New message received ++++++++++++++++++++++++++++++++", "\n",
+          "| ShipName =", ship_name,  "\n",
+          "| MMSI =", mmsi,  "\n",
           "| Latitude =", lat, 
-          "| Longitude =", lon, 
-          "| TimeUTC =", time_utc, 
+          "| Longitude =", lon,  "\n",
+          "⚓️ TimeUTC =", time_utc, 
           "📍 \n"
         )
         
