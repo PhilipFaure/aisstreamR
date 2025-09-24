@@ -152,6 +152,10 @@ connect_ais_stream <- function(api_key, bounding_box = NULL, file_path = NULL, l
     )
   }
   
+  # Initialize a list to store data frame rows and set the batch size
+  .aisstream_env$batch_list <- list()
+  .aisstream_env$batch_size <- 500
+  
   start_connection <- function() {
     
     ws <- websocket::WebSocket$new(
@@ -278,15 +282,41 @@ connect_ais_stream <- function(api_key, bounding_box = NULL, file_path = NULL, l
             # Reorder the columns to match the master list
             decoded_df <- decoded_df[, master_ais_columns]
             
+            # Add data to batch list
+            .aisstream_env$batch_list[[length(.aisstream_env$batch_list) + 1]] <- decoded_df
+            
+            # Check if the batch is full
+            if (length(.aisstream_env$batch_list) >= .aisstream_env$batch_size) {
+              
+              # Combine all data frames in the list into one
+              full_batch <- do.call(rbind, .aisstream_env$batch_list)
+              
+              # Write the entire batch to the CSV file
+              filename <- file.path(outDir, "ais_data.csv")
+              write.table(
+                full_batch,
+                file = filename,
+                append = TRUE,
+                row.names = FALSE,
+                col.names = !file.exists(filename),
+                sep = ","
+              )
+              
+              # Clear the batch list for the next batch
+              .aisstream_env$batch_list <- list()
+              if (verbose) {
+                cat("Wrote a batch of", .aisstream_env$batch_size, "messages to CSV.\n")
+              }
+            }
             # Write to CSV with a header only if the file is new
-            write.table(
-              decoded_df, 
-              file = filename, 
-              append = TRUE, 
-              row.names = FALSE, 
-              col.names = !file.exists(filename), 
-              sep = ","
-            )
+            # write.table(
+            #   decoded_df, 
+            #   file = filename, 
+            #   append = TRUE, 
+            #   row.names = FALSE, 
+            #   col.names = !file.exists(filename), 
+            #   sep = ","
+            # )
           }
         }
       }
@@ -297,13 +327,63 @@ connect_ais_stream <- function(api_key, bounding_box = NULL, file_path = NULL, l
         if (verbose) {
           cat("WebSocket closed. Reconnecting in", reconnect_delay, "seconds...\n")
         }
+        
+        # New code to write remaining batch data
+        if (length(.aisstream_env$batch_list) > 0) {
+          if (verbose) {
+            cat("Writing remaining", length(.aisstream_env$batch_list), "messages to CSV before reconnecting...\n")
+          }
+          full_batch <- do.call(rbind, .aisstream_env$batch_list)
+          filename <- file.path(outDir, "ais_data.csv")
+          write.table(
+            full_batch,
+            file = filename,
+            append = TRUE,
+            row.names = FALSE,
+            col.names = !file.exists(filename),
+            sep = ","
+          )
+          .aisstream_env$batch_list <- list() # Clear the list
+        }
+        
         .aisstream_env$reconnect_handle <- later::later(start_connection, reconnect_delay)
       } else {
+        # This part handles intentional shutdown, so also write the batch
         if (verbose) {
           message(" 🪦 AIS WebSocket rests peacefully...\n")
         }
+        
+        # New code to write final batch on intentional shutdown
+        if (length(.aisstream_env$batch_list) > 0) {
+          if (verbose) {
+            cat("Writing final", length(.aisstream_env$batch_list), "messages to CSV...\n")
+          }
+          full_batch <- do.call(rbind, .aisstream_env$batch_list)
+          filename <- file.path(outDir, "ais_data.csv")
+          write.table(
+            full_batch,
+            file = filename,
+            append = TRUE,
+            row.names = FALSE,
+            col.names = !file.exists(filename),
+            sep = ","
+          )
+          .aisstream_env$batch_list <- list() # Clear the list
+        }
       }
     })
+    # ws$onClose(function(event) {
+    #   if (!isTRUE(.aisstream_env$is_shutting_down)) {
+    #     if (verbose) {
+    #       cat("WebSocket closed. Reconnecting in", reconnect_delay, "seconds...\n")
+    #     }
+    #     .aisstream_env$reconnect_handle <- later::later(start_connection, reconnect_delay)
+    #   } else {
+    #     if (verbose) {
+    #       message(" 🪦 AIS WebSocket rests peacefully...\n")
+    #     }
+    #   }
+    # })
     
     ws$onError(function(event) {
       if (verbose) {

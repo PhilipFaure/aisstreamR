@@ -1,0 +1,12 @@
+---
+title: "aisstreamR User Guide"
+author: "Philip Faure"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{aisstreamR User Guide}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
