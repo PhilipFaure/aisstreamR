@@ -13,7 +13,7 @@
 #'
 #' @export
 close_ais_stream <- function() {
-  # Check if the dedicated environment exists and if the 'ws' object is in it
+  
   if (!exists(".aisstream_env") || !exists("ws", envir = .aisstream_env)) {
     message("No active AIS stream found.")
     return(invisible(FALSE))
@@ -23,14 +23,12 @@ close_ais_stream <- function() {
   
   # Check for a valid WebSocket object
   if (inherits(ws, "WebSocket")) {
-    # Set the shutdown flag BEFORE closing the connection
+    # Set the shutdown flag before closing the connection
     .aisstream_env$is_shutting_down <- TRUE
     
-    # It's good practice to wrap the close call in try() in case it's already closed
     try(ws$close(), silent = TRUE)
     message("AIS WebSocket closing...")
     
-    # Cancel reconnect handle by calling it as a function
     if (exists("reconnect_handle", envir = .aisstream_env)) {
       later_handle <- get("reconnect_handle", envir = .aisstream_env)
       if (is.function(later_handle)) {
@@ -39,7 +37,6 @@ close_ais_stream <- function() {
       rm("reconnect_handle", envir = .aisstream_env)
     }
     
-    # Cancel heartbeat handle by calling it as a function
     if (exists("heartbeat_handle", envir = .aisstream_env)) {
       later_handle <- get("heartbeat_handle", envir = .aisstream_env)
       if (is.function(later_handle)) {
@@ -48,7 +45,6 @@ close_ais_stream <- function() {
       rm("heartbeat_handle", envir = .aisstream_env)
     }
     
-    # Remove the ws object to signal the stream is no longer active
     rm("ws", envir = .aisstream_env)
     
     return(invisible(TRUE))
