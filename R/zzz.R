@@ -14,7 +14,7 @@
     paste0(
       "🚀 ", pkgname, "\n",
       "Version: ", "v", v, "\n",
-      "VersionName: ", " \"", vN, "\"  🍜"
+      "VersionName: ", " \"", vN, "\""
     )
   )
 }
