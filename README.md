@@ -1,6 +1,6 @@
 # aisstreamR ⚓️
 
-![How to](https://github.com/PhilipFaure/aisstreamR/blob/main/images/connect_ais_stream.gif)
+![How to](https://github.com/PhilipFaure/aisstreamR/blob/main/images/connect_ais_stream-2.gif)
 
 ### Description ⚓️
 
@@ -34,7 +34,11 @@ To close the connection and stop receiving data, you can use the `close_ais_stre
 ```
 # installation
 devtools::install_github("PhilipFaure/aisstreamR")
+```
 
+![How to](https://github.com/PhilipFaure/aisstreamR/blob/main/images/install_github_aisstreamR.gif)
+
+```
 # load package
 library(aisstreamR)
 
