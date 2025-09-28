@@ -9,7 +9,9 @@ library(sf)
 library(RSQLite)
 library(httr)
 
-run_main_pipeline <- function(api_key, telegram_bot_token, telegram_chat_id, outDir) {
+run_main_pipeline <- function(api_key, telegram_bot_token, telegram_chat_id, 
+                              outDir, vessels_mmsi = "./data/vessel_mmsi.csv",
+                              port_locations = "./data/port_locations.csv") {
   
   # instead of from user argument can get credentials from sys.env:
   # api_key <- Sys.getenv("AISSTREAM_API_KEY")
@@ -30,12 +32,12 @@ run_main_pipeline <- function(api_key, telegram_bot_token, telegram_chat_id, out
     list(c(-34.5, 19.1), c(-34.3, 19.3))   # EXAMPLE -- ADD COORDINATES
   )
   
-  closure_das <- sf::st_as_sfc("SHAPEFILE", crs = 4326)
-  closure_rob <- sf::st_as_sfc("SHAPEFILE", crs = 4326)
-  closure_sto <- sf::st_as_sfc("SHAPEFILE", crs = 4326)
-  closure_dye <- sf::st_as_sfc("SHAPEFILE", crs = 4326)
-  closure_stc <- sf::st_as_sfc("SHAPEFILE", crs = 4326)
-  closure_bir <- sf::st_as_sfc("SHAPEFILE", crs = 4326)
+  closure_das <- sf::st_as_sfc("SHAPEFILE", crs = 4326) # to be added by phil
+  closure_rob <- sf::st_as_sfc("SHAPEFILE", crs = 4326) # to be added by phil
+  closure_sto <- sf::st_as_sfc("SHAPEFILE", crs = 4326) # to be added by phil
+  closure_dye <- sf::st_as_sfc("SHAPEFILE", crs = 4326) # to be added by phil
+  closure_stc <- sf::st_as_sfc("SHAPEFILE", crs = 4326) # to be added by phil
+  closure_bir <- sf::st_as_sfc("SHAPEFILE", crs = 4326) # to be added by phil
   
   # Database connection
   db <- RSQLite::dbConnect(RSQLite::SQLite(), "ais_vessels.sqlite")
@@ -49,9 +51,11 @@ run_main_pipeline <- function(api_key, telegram_bot_token, telegram_chat_id, out
   
   message("Starting 5-minute AIS scan...")
   
-  # -------------------------------------------------------------------------- #
-  # Run for entire coastline
-  # -------------------------------------------------------------------------- #
+  # Run for entire coastline. the stream should search all of the SA EEZ for any 
+  # MMSI vessels coded into the pipeline. currently connect_ais_stream() can't 
+  # search for specific vessel so it is provided below and then the data is 
+  # is filtered. 
+  
   ws <- connect_ais_stream(
     api_key = api_key,
     bounding_box = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
@@ -70,16 +74,22 @@ run_main_pipeline <- function(api_key, telegram_bot_token, telegram_chat_id, out
       
       # read in the CSV database and take only the last 5 minutes of data.
       
-      # filter for the provided list of MMSI numbers read in as a CSV named: "vessel_mmsi.csv"
+      # filter for the provided list of MMSI numbers read in as a CSV named: 
+      # "ais-monitor/data/vessel_mmsi.csv". Argument `vessels_mmsi` include in 
+      # function if the user wants to provide the CSV manually. 
       
-      # check whether they are at a port (i.e., 500 m from a port coordinates 
-      # provided in the CSV named: "port_locations.csv"), or on land, or out at 
-      # sea, write to database column: VesselLocation either "port" or "atsea". 
+      # after selecting all data for vessel included in vessel_mmsi.csv, then check 
+      # whether vessel is at sea or not.
+      
+      # argument:port_locations = "./data/port_locations.csv". check whether they 
+      # are at a port (i.e., 500 m from a port coordinates provided in the CSV 
+      # named: "./data/port_locations.csv"), or on land, or out at 
+      # sea, write to database column: vesselLocation either "port" or "atsea". 
       # When checking whether the vessel is on land it can be overlayed with 
       # country admin boundaries from package: xxxx?
       
       # see whether the points overlap with any of the closure areas' shapefiles 
-      # write to database column: "FishingClosure" either "inside" or "outside"
+      # write to database column: "fishingClosure" either "inside" or "outside"
       
       # if the vessel is out at sea (i.e.,  not within 500 m from a port/harbour)
       # then continue tracking it location via AIS stream until it gets back to 
@@ -159,7 +169,9 @@ is_in_closure <- function(){
 run_main_pipeline(
   api_key, 
   telegram_bot_token, 
-  telegram_chat_id
+  telegram_chat_id, 
+  outDir,
+  vessels_mmsi
 )
 
 # ---------------------------------------------------------------------------- #
