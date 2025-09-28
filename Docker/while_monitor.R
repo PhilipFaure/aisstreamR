@@ -8,7 +8,7 @@ bbox <- list(
   )
 )
 
-latest_csv <- "path"
+latest_csv <- "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX"
 
 target_time <- Sys.time() + 300
 stop_file <- "stop.txt"
@@ -87,19 +87,4 @@ tryCatch({
   }
 })
 
-start_time <- Sys.time()
-
-df <- readr::read_csv("./test/ais_data.csv") %>% 
-  dplyr::filter(mmsi %in% target_mmsi) %>% 
-  dplyr::arrange(datetime) %>% 
-  dplyr::distinct(mmsi,
-                  latitude, 
-                  longitude, 
-                  .keep_all = TRUE) 
-
-df_sf <- df %>% 
-  sf::st_as_sf(coords = c("longitude", 
-                          "latitude"),
-               crs = 4326)
-
-
+print(Sys.time())
