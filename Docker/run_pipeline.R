@@ -1,6 +1,5 @@
 # run_pipeline.R
 
-# Load all required packages
 library(aisstreamR)
 library(websocket)
 library(jsonlite)
@@ -8,14 +7,14 @@ library(lubridate)
 library(later)
 library(sf)
 library(RSQLite)
-library(httr) # For Telegram API calls
+library(httr)
 
-# Main function to run the pipeline
-run_main_pipeline <- function() {
-  # Load sensitive information from environment variables
-  api_key <- Sys.getenv("AISSTREAM_API_KEY")
-  telegram_bot_token <- Sys.getenv("TELEGRAM_BOT_TOKEN")
-  telegram_chat_id <- Sys.getenv("TELEGRAM_CHAT_ID")
+run_main_pipeline <- function(api_key, telegram_bot_token, telegram_chat_id, outDir) {
+  
+  # instead of from user argument can get credentials from sys.env:
+  # api_key <- Sys.getenv("AISSTREAM_API_KEY")
+  # telegram_bot_token <- Sys.getenv("TELEGRAM_BOT_TOKEN")
+  # telegram_chat_id <- Sys.getenv("TELEGRAM_CHAT_ID")
   
   if (api_key == "" || telegram_bot_token == "" || telegram_chat_id == "") {
     stop("Required environment variables are not set.")
@@ -23,13 +22,20 @@ run_main_pipeline <- function() {
   
   # Define Penguin Colonies as a list of bounding boxes
   penguin_colonies <- list(
-    list(c(-34.0, 18.3), c(-33.8, 18.6)), # Example: Cape Town
-    list(c(-34.5, 19.1), c(-34.3, 19.3)) # Example: Betty's Bay
+    list(c(-34.0, 18.3), c(-33.8, 18.6)),  # EXAMPLE -- ADD COORDINATES
+    list(c(-34.5, 19.1), c(-34.3, 19.3))   # EXAMPLE -- ADD COORDINATES
+    list(c(-34.5, 19.1), c(-34.3, 19.3))   # EXAMPLE -- ADD COORDINATES
+    list(c(-34.5, 19.1), c(-34.3, 19.3))   # EXAMPLE -- ADD COORDINATES
+    list(c(-34.5, 19.1), c(-34.3, 19.3))   # EXAMPLE -- ADD COORDINATES
+    list(c(-34.5, 19.1), c(-34.3, 19.3))   # EXAMPLE -- ADD COORDINATES
   )
   
-  # Define Fishing Closures (as sf polygons)
-  # You would load these from a file in a real-world scenario
-  closure_poly <- sf::st_as_sfc("POLYGON((-34.05 18.4, -34.05 18.5, -33.95 18.5, -33.95 18.4, -34.05 18.4))", crs = 4326)
+  closure_das <- sf::st_as_sfc("SHAPEFILE", crs = 4326)
+  closure_rob <- sf::st_as_sfc("SHAPEFILE", crs = 4326)
+  closure_sto <- sf::st_as_sfc("SHAPEFILE", crs = 4326)
+  closure_dye <- sf::st_as_sfc("SHAPEFILE", crs = 4326)
+  closure_stc <- sf::st_as_sfc("SHAPEFILE", crs = 4326)
+  closure_bir <- sf::st_as_sfc("SHAPEFILE", crs = 4326)
   
   # Database connection
   db <- RSQLite::dbConnect(RSQLite::SQLite(), "ais_vessels.sqlite")
@@ -40,64 +46,122 @@ run_main_pipeline <- function() {
         last_ping TEXT
     )")
   
-  # Main loop logic (simplified for demonstration)
-  # Your pipeline will run this in a scheduled GitHub Action
   
-  # 1. Connect and scan for 5 minutes
-  print("Starting 5-minute scan for all penguin colonies...")
+  message("Starting 5-minute AIS scan...")
+  
+  # -------------------------------------------------------------------------- #
+  # Run for entire coastline
+  # -------------------------------------------------------------------------- #
   ws <- connect_ais_stream(
     api_key = api_key,
-    bounding_box = penguin_colonies,
-    outDir = "ais_data",
+    bounding_box = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    file_path = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    layer = "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX",
+    outDir = outDir,
     reconnect_delay = 5
   )
   
-  # This will need to be an event loop
-  # later::later(function() {
-  #     ws$close()
-  # }, delay = 300) # 300 seconds = 5 minutes
+  # This will collect data for 5 minutes until close_ais_connection() is called
+  # by later. But before closing, analyse data to check if any of the vessels are 
+  # (a) out at sea, and (b) inside a fishing closure area.
   
-  # We need a more robust way to handle the loop
-  # Let's outline the core logic of the onMessage handler
+  later::later(
+    function() {
+      
+      # read in the CSV database and take only the last 5 minutes of data.
+      
+      # filter for the provided list of MMSI numbers read in as a CSV named: "vessel_mmsi.csv"
+      
+      # check whether they are at a port (i.e., 500 m from a port coordinates 
+      # provided in the CSV named: "port_locations.csv"), or on land, or out at 
+      # sea, write to database column: VesselLocation either "port" or "atsea". 
+      # When checking whether the vessel is on land it can be overlayed with 
+      # country admin boundaries from package: xxxx?
+      
+      # see whether the points overlap with any of the closure areas' shapefiles 
+      # write to database column: "FishingClosure" either "inside" or "outside"
+      
+      # if the vessel is out at sea (i.e.,  not within 500 m from a port/harbour)
+      # then continue tracking it location via AIS stream until it gets back to 
+      # a harbour again.
+      
+      # if any vessels are at sea, the webSocket connection should be kept open
+      # and data continuously collected. Therefore need to write a line of code
+      # which checks whether the last record for each vessel in the latest 
+      # database is "port". E.g.: if(all(db$VesselLocation) == "port"){close_ais_stream()}
+
+    },
+    delay = 5*60
+  )
   
-  # Simplified onMessage logic within the connect_ais_stream function
-  # This is for conceptual understanding of the pipeline flow
+  close_ais_stream()
+  
+  
   on_message_handler <- function(event) {
     # Decode the message
     decoded <- jsonlite::fromJSON(event$data)
     
     # Check if it's a purse seine vessel
-    is_purse_seine <- (decoded$MessageType == "ShipStaticData" && decoded$ShipStaticData$Type == 50) # Example type code
-    is_at_sea <- !is_in_port(decoded) # You need to define this helper function
+    is_purse_seine <- "XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" 
+    is_at_sea <- !is_in_port(decoded) # helper function NOT DONE................
     
     if (is_purse_seine && is_at_sea) {
       mmsi <- decoded$MetaData$MMSI
-      # Check if the vessel is already being tracked
-      if (!is_tracking(mmsi)) {
-        # Start tracking: Add to database
-        RSQLite::dbExecute(db, "INSERT OR REPLACE INTO tracked_vessels (mmsi, ship_name, start_time, last_ping) VALUES (?, ?, ?, ?)",
-                           params = list(mmsi, decoded$MetaData$ShipName, as.character(Sys.time()), as.character(Sys.time())))
-        print(paste("Started tracking new purse seine vessel:", mmsi))
+      
+      if (!is_tracking(mmsi)) { # Is the vessel already being tracked?
+        # Start tracking. Add to database
+        RSQLite::dbExecute(db, 
+                           "INSERT OR REPLACE INTO tracked_vessels (mmsi, ship_name, start_time, last_ping) VALUES (?, ?, ?, ?)",
+                           params = list(mmsi, decoded$MetaData$ShipName, 
+                                         as.character(Sys.time()), 
+                                         as.character(Sys.time())))
+        print(
+          paste(
+            "Started tracking new purse seine vessel:", 
+            mmsi
+          )
+        )
       }
     }
     
     # Check if any tracked vessel is in a fishing closure
     if (is_in_closure(decoded, closure_poly)) {
-      send_telegram_alert(decoded, telegram_bot_token, telegram_chat_id)
-      print(paste("ALERT: Vessel", decoded$MetaData$MMSI, "in a closure!"))
+      send_telegram_alert(decoded, 
+                          telegram_bot_token, 
+                          telegram_chat_id)
+      print(paste("ALERT: Vessel", 
+                  decoded$MetaData$MMSI, 
+                  "in a closure!"))
     }
   }
-  
-  # Your connect_ais_stream needs to be modified to accept this `on_message_handler`
-  # and integrate with the database logic.
 }
 
-# Helper function to send Telegram alert
+# Send Telegram alert
 send_telegram_alert <- function(decoded_msg, bot_token, chat_id) {
-  # ... API call logic to Telegram here ...
-  # This would use httr to post a message with the vessel info and location
-  # A map could be a static image generated with sf and uploaded or a link
+  # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+  # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+  # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
 }
 
-# Execute the main function
-run_main_pipeline()
+# 
+is_in_port <- function(){
+  # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+  # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+  # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+}
+is_in_closure <- function(){
+  # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+  # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+  # XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+}
+
+# Run
+run_main_pipeline(
+  api_key, 
+  telegram_bot_token, 
+  telegram_chat_id
+)
+
+# ---------------------------------------------------------------------------- #
+# ---------------------------------------------------------------------------- #
+# END ---------------------------------------------------------------------- #
