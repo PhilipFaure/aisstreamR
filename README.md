@@ -12,7 +12,7 @@
 
 The package handles WebSocket connections, subscribes to data streams based on user-defined bounding boxes, and decodes the incoming AIS messages into a user-friendly format. It also includes an option to automatically save the received data to a CSV file. 
 
-NOTE: AISStream.io does not have great coverage for South African waters, and therefore I stopped developing this package. Sorry nê.
+NOTE: AISStream.io does not have great coverage for South African waters, therefore I stopped developing this package. Works great for North American, European and Mediteranean areas though. Sorry nê.
 
 ---
 
