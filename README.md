@@ -26,11 +26,11 @@ To close the connection and stop receiving data, you can use the `close_ais_stre
 
 ### Key Functions ⚓️
 
-    `connect_ais_stream()`: Establishes a WebSocket connection and begins streaming data.
+`connect_ais_stream()`: Establishes a WebSocket connection and begins streaming data.
 
-    `close_ais_stream()`: Closes the active WebSocket connection.
+`close_ais_stream()`: Closes the active WebSocket connection.
 
-    `decode_ais_hex()`: Decodes raw hexadecimal AIS messages into a structured R object (used internally by connect_ais_stream).
+`decode_ais_hex()`: Decodes raw hexadecimal AIS messages into a structured R object (used internally by connect_ais_stream).
 
 ---
 
