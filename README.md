@@ -1,5 +1,9 @@
 # aisstreamR ⚓️
 
+
+[![DOI](https://zenodo.org/badge/1062829302.svg)](https://doi.org/10.5281/zenodo.17404354)
+
+
 ![How to](https://github.com/PhilipFaure/aisstreamR/blob/main/images/connect_ais_stream-2.gif)
 
 ### Description ⚓️
