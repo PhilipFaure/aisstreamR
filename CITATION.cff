@@ -1,0 +1,9 @@
+cff-version: 1.1.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: Faure
+  given-names: J. Philip B.
+orcid: https://orcid.org/0000-0001-5183-5487
+title:PhilipFaure/aisstreamR: throwing breadrolls
+version: v1.0.0
+date-released: 2025-10-21
